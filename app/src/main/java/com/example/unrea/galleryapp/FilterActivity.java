@@ -1,8 +1,13 @@
 package com.example.unrea.galleryapp;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
 
 public class FilterActivity extends AppCompatActivity {
 
@@ -10,15 +15,20 @@ public class FilterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
-        //asdf
     }
 
-    public void dateFilter()
+    public void dateFilter(View view)
     {
         String start = ((EditText)findViewById(R.id.dateText1)).getText().toString();
         String end = ((EditText)findViewById(R.id.dateText2)).getText().toString();
-
-        System.out.println(start + " | " + end);
+        if (view != null)
+        {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+        Intent intent = new Intent(this, GalleryActivity.class);
+        intent.putExtra("MESSAGE", start+ " "+end);
+        startActivity(intent);
     }
 
 
