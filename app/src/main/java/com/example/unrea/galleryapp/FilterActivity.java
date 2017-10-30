@@ -26,7 +26,7 @@ public class FilterActivity extends AppCompatActivity {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-        Intent intent = new Intent(this, GalleryActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("MESSAGE", start+ " "+end);
         startActivity(intent);
     }
