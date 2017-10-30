@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -67,7 +68,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    String mCurrentPhotoPath;
+    private void filter() {
+        try {
+            ExifInterface exifInterface = new ExifInterface("test.jpg");
+
+        } catch (IOException e) {
+            //herp
+        }
+    }
+
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -80,9 +89,6 @@ public class MainActivity extends AppCompatActivity {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
