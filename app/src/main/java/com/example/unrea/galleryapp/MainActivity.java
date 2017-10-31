@@ -118,6 +118,64 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void locationFilter(double lat1, double long1, double lat2, double long2) {
+        try {
+
+            ArrayList<String> filesPath = new ArrayList<String>();
+            ArrayList<String> filesName = new ArrayList<String>();
+
+            for(int i = 0; i < listFile.length; i++) {
+                ExifInterface exif = new ExifInterface(FilePathStrings[i]);
+                double testLat = Double.parseDouble(exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE));
+                double testLong = Double.parseDouble(exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE));
+                if(testLat >= lat1 && testLong <= long1 && testLat <= lat2 && testLong <= long2) {
+                    filesPath.add(FilePathStrings[i]);
+                    filesName.add(FileNameStrings[i]);
+                }
+            }
+            FileNameStrings = (String[]) filesName.toArray();
+            FilePathStrings = (String[]) filesPath.toArray();
+
+            grid = (GridView) findViewById(R.id.gridview);
+            // Pass String arrays to LazyAdapter Class
+            adapter = new GridViewAdapter(this, FilePathStrings, FileNameStrings);
+            // Set the Adapter to the GridView
+            grid.setAdapter(adapter);
+
+        } catch (Exception e) {
+            String t = e.getMessage();
+
+        }
+    }
+
+    private void captionFilter(String caption) {
+        try {
+
+            ArrayList<String> filesPath = new ArrayList<String>();
+            ArrayList<String> filesName = new ArrayList<String>();
+
+            for(int i = 0; i < listFile.length; i++) {
+                ExifInterface exif = new ExifInterface(FilePathStrings[i]);
+                String test = exif.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION);
+                if(test.equals(caption)) {
+                    filesPath.add(FilePathStrings[i]);
+                    filesName.add(FileNameStrings[i]);
+                }
+            }
+            FileNameStrings = (String[]) filesName.toArray();
+            FilePathStrings = (String[]) filesPath.toArray();
+
+            grid = (GridView) findViewById(R.id.gridview);
+            // Pass String arrays to LazyAdapter Class
+            adapter = new GridViewAdapter(this, FilePathStrings, FileNameStrings);
+            // Set the Adapter to the GridView
+            grid.setAdapter(adapter);
+
+        } catch (Exception e) {
+            String t = e.getMessage();
+
+        }
+    }
 
     private File createImageFile() throws IOException {
         // Create an image file name

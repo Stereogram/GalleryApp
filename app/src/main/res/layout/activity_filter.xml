@@ -52,21 +52,36 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Location" />
+                android:text="Location"
+                android:onClick="locationFilter"/>
 
             <EditText
-                android:id="@+id/locationText1"
-                android:layout_width="120dp"
+                android:id="@+id/lat1"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textPersonName" />
+                android:inputType="number" />
 
             <EditText
-                android:id="@+id/locationText2"
-                android:layout_width="120dp"
+                android:id="@+id/long1"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textPersonName" />
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/lat2"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/long2"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number" />
 
         </LinearLayout>
 
@@ -80,7 +95,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Caption" />
+                android:text="Caption"
+                android:onClick="captionFilter"/>
 
             <EditText
                 android:id="@+id/captionText"
