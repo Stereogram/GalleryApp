@@ -27,7 +27,11 @@ public class FilterActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("MESSAGE", start+ " "+end);
+        Bundle dataMap = new Bundle();
+        dataMap.putChar("type",'d');
+        dataMap.putString("dateStart", start);
+        dataMap.putString("dateEnd", end);
+        intent.putExtras(dataMap);
         startActivity(intent);
     }
 

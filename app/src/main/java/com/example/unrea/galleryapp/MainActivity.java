@@ -1,13 +1,18 @@
 package com.example.unrea.galleryapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -18,10 +23,13 @@ import android.widget.GridView;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Logger;
 
-import static android.os.Environment.getExternalStoragePublicDirectory;
+import static android.media.ExifInterface.*;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,6 +53,16 @@ public class MainActivity extends AppCompatActivity {
         verifyStoragePermissions(this);
         setContentView(R.layout.activity_main);
 
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        loadPictures();
+        if(bundle != null && bundle.getChar("type") == 'd') {
+            dateFilter(bundle.getString("dateStart"),bundle.getString("dateEnd"));
+        }
+
+    }
+
+    private void loadPictures() {
         File file = new File("/sdcard/Pictures");
         listFile = file.listFiles();
         // Create a String array for FilePathStrings
@@ -65,15 +83,38 @@ public class MainActivity extends AppCompatActivity {
         adapter = new GridViewAdapter(this, FilePathStrings, FileNameStrings);
         // Set the Adapter to the GridView
         grid.setAdapter(adapter);
-
     }
 
-    private void filter() {
+    private void dateFilter(String start, String end) {
         try {
-            ExifInterface exifInterface = new ExifInterface("test.jpg");
+            DateFormat df = new SimpleDateFormat("mm/dd/yyyy");
+            Date startDate = df.parse(start);
+            Date endDate = df.parse(end);
 
-        } catch (IOException e) {
-            //herp
+            ArrayList<String> filesPath = new ArrayList<String>();
+            ArrayList<String> filesName = new ArrayList<String>();
+
+            for(int i = 0; i < listFile.length; i++) {
+                ExifInterface exif = new ExifInterface(FilePathStrings[i]);
+                String t = exif.getAttribute(ExifInterface.TAG_DATETIME);
+                Date test = df.parse(t);
+                if(!test.before (startDate) && !test.after (endDate)) {
+                    filesPath.add(FilePathStrings[i]);
+                    filesName.add(FileNameStrings[i]);
+                }
+            }
+            FileNameStrings = (String[]) filesName.toArray();
+            FilePathStrings = (String[]) filesPath.toArray();
+
+            grid = (GridView) findViewById(R.id.gridview);
+            // Pass String arrays to LazyAdapter Class
+            adapter = new GridViewAdapter(this, FilePathStrings, FileNameStrings);
+            // Set the Adapter to the GridView
+            grid.setAdapter(adapter);
+
+        } catch (Exception e) {
+            String t = e.getMessage();
+
         }
     }
 
@@ -89,8 +130,11 @@ public class MainActivity extends AppCompatActivity {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
+
         return image;
     }
+
+
 
     static final int REQUEST_TAKE_PHOTO = 1;
 
@@ -114,7 +158,28 @@ public class MainActivity extends AppCompatActivity {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
+            loadPictures();
+            try {
+                ExifInterface exif = new ExifInterface(photoFile.getAbsolutePath());
+                String date = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+                exif.setAttribute(ExifInterface.TAG_DATETIME, date);
+                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+                @SuppressLint("MissingPermission") Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                String longitude = String.valueOf(location.getLongitude());
+                String latitude = String.valueOf(location.getLatitude());
+                exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, latitude);
+                exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, longitude);
+                exif.saveAttributes();
+            } catch (Exception e) {
+                //herp
+            }
+
         }
+
+
+
+
     }
 
     public void filter_Click(View v) {
@@ -137,8 +202,10 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(
                     activity,
                     PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
+                    REQUEST_EXTERNAL_STORAGE);
+        }
+            if(ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
     }
 
